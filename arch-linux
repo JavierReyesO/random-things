@@ -1,0 +1,214 @@
+######## PREPARE THE SYSTEM ########
+
+Configurate keymap (one of this options):
+1) $ loadkeys es
+2) $ loadkeys la-latin1 
+ 
+Create partitions with: $ cfdisk
+Example of size of partitions:
+ 
+/boot = 150 o 200 MB (Bootable)
+ 
+/ = 10-15 Gb.
+ 
+/home = lo que sea 
+ 
+Swap = 4GB (Linux Swap)
+ 
+Format:
+
+/boot : $ mkfs -t ext2 /dev/sdaX (TRY: mkfs.fat -F32 /dev/sdaX)
+
+/ con ext4: $ mkfs -t ext4 /dev/sdaX
+
+/home con ext4: $ mkfs -t ext4 /dev/sdaX
+
+swap: $ mkswap /dev/sdaX
+
+Active swap:
+ 
+$ swapon /dev/sdaX
+ 
+Mount:	/ en /mnt: $ mount /dev/sdaX /mnt
+
+Create directories for other partitions: 
+$ mkdir /mnt/boot
+$ mkdir /mnt/home
+
+Mount partitions:
+ 
+$ mount /dev/sdaX /mnt/boot
+$ mount /dev/sdaX /mnt/home
+ 
+Verify net connection
+ 
+ping -c 3 www.google.com
+
+If you need to use WIFI:
+ 
+$ sudo nmcli dev wifi connect "SSID" password "contraseña"
+
+######## INSTALLATION OF THE SYSTEM ########
+ 
+$ pacstrap /mnt base base-devel
+$ pacstrap /mnt grub-bios
+$ pacstrap /mnt networkmanager
+For the touch pad: $ pacstrap /mnt xf86-input-synaptics
+
+Generate the fstab file: $ genfstab -U -p /mnt >> /mnt/etc/fstab
+
+For config the system: $ arch-chroot /mnt 
+
+Set the name with: $ nano /etc/hostname
+-> myhostname
+
+Add matching entries to /etc/hosts:
+$ nano /etc/hosts
+-> 127.0.0.1	localhost
+-> ::1		localhost
+-> 127.0.1.1	
+
+Set the time zone: $ ln -s /usr/share/zoneinfo/America/Santiago /etc/localtime
+ 
+Preference of location (one of the option):
+$ nano /etc/locale.conf
+ 
+1) -> LANG=es_CL.UTF-8 for Spanish
+2) -> LANG=en_US.UTF-8 for English
+ 
+Active our location:
+Remove the '#' at the beginning of the line of our location in:
+$ nano /etc/locale.gen
+
+Generate location: $ locale-gen
+ 
+Set the distribution of our keyboard:
+$ nano /etc/vconsole.conf
+
+Inside of the /etc/vconsole.conf file put one of the options:
+1) -> KEYMAP=es
+2) -> KEYMAP=la-latin1
+
+Add a root certificate: $ sudo update-ca-trust
+
+In /etc/pacman.conf
+Uncomment: [multilib]
+	   Include = /etc/pacman.d/mirrorlist
+
+FOR DUAL BOOT:
+1] Linux boot loader option:
+	$ pacstrap /mnt grub efibootmgr dosfstools os-prober mtools
+	$ mkdir -p /mnt/boot/efi
+	$ mount /dev/sdaX /mnt/boot/efi
+	$ grub-install --target=86_64-efi --bootloader-id=grub_uefi --recheck
+	If you have problems use:
+	$ ...
+ 	
+	Create the file grub.cfg:
+	grub-mkconfig -o /boot/grub/grub.cfg
+ 
+Generate ramdisk: $ mkinitcpio -p linux
+ 
+Set password on root: $ passwd
+
+Close chroot: $ exit
+ 
+Unmount all the partitions:
+($ umount -a)
+$ umount /mnt/{boot,home,}
+ 
+$ reboot
+ 
+ACTIVAR NETWORK MANAGER
+ 
+$ systemctl start NetworkManager.service
+$ systemctl enable NetworkManager.service
+ 
+Create a user
+ 
+$ useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash bigoteh
+$ passwd bigoteh
+ 
+$ nano /etc/sudoers
+Delete ‘#‘ at the beginning of the line: %wheel ALL=(ALL) ALL:
+
+$ reboot
+
+Update the system:
+ 
+$ sudo pacman -Syu
+ 
+INSTALACIÓN DE XORG:
+$ sudo pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils
+
+INSTALACION DE MESA:
+$ sudo pacman -S mesa mesa-demos
+
+PROBAR EL ENTORNO
+$ sudo pacman -S xorg-twm xorg-xclock xterm
+
+$ startx
+
+OPTIMUS DRIVER MAS INTEL 
+nvidia+intel (tecnologia OPTIMUS):
+$ pacman -S intel-dri xf86-video-intel bumblebee nvidia bbswitch primus
+
+Install bash autocomplete:
+$ pacman -S bash-completion
+
+agregar usuario al grupo de trabajo de bumblebee:
+gpasswd bumblebee -a $USER
+
+iniciamos el arranque del servicio y arrancamos el servicio:
+$ systemctl enable bumblebeed
+$ systemctl start bumblebeed
+
+	INSTALACIÓN DE GNOME
+	$ sudo pacman -S gnome gnome-extra
+ 
+	INSTALLATION OF COMPLETEMENTS
+
+	Applet de bateria (para equipos portatiles):
+	$ sudo pacman -S gnome-power-manager
+
+	Herramienta para configurar la apariencia:
+	$ sudo pacman -S gnome-tweak-tool
+ 
+	Gestor de paquetes grafico:
+	$ sudo pacman -S gnome-packagekit
+ 
+	Para que GNOME compruebe automáticamente si hay actualizaciones,  instalamos las siguientes herramientas:
+	$ sudo pacman -S gnome-settings-daemon-updates polkit-gnome
+
+		INSTALLATION OF KDE
+
+		$ sudo pacman -S plasma
+
+		INSTALLATION OF COMPLETEMENTS
+
+		$ sudo pacman -S sddm
+		Check is running: $ sudo systemctl status sddm
+		$ sudo systemctl start sddm		
+		$ sudo systemctl enable sddm
+		
+		$ pacman -S plasma-nm
+		
+		Install best terminal for KDE
+		$ pacman -S yakuake 
+
+		$ pacman -S dialog
+
+		$ pacman -S ntfs-3g
+
+ACTIVAR GDM:
+ 
+sudo systemctl enable gdm.service
+
+sudo reboot
+
+
+######## AFTER INSTALLATION ########
+
+$ git clone https://aur.archlinux.org/yay.git
+$ cd yay
+$ makepkg -si

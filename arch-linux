@@ -5,40 +5,34 @@ Configurate keymap (one of this options):
 2) $ loadkeys la-latin1 
  
 Create partitions with: $ cfdisk
+
 Example of size of partitions:
- 
-/boot = 150 o 200 MB (Bootable)
- 
 / = 10-15 Gb.
- 
 /home = lo que sea 
- 
 Swap = 4GB (Linux Swap)
- 
-Format:
 
-/boot : $ mkfs -t ext2 /dev/sdaX (TRY: mkfs.fat -F32 /dev/sdaX)
+/boot : 
+$ mkfs -t ext2 /dev/sdaX (TRY: mkfs.fat -F32 /dev/sdaX)
 
-/ con ext4: $ mkfs -t ext4 /dev/sdaX
+/ con ext4: 
+$ mkfs -t ext4 /dev/sdaX
 
-/home con ext4: $ mkfs -t ext4 /dev/sdaX
+/home con ext4: 
+$ mkfs -t ext4 /dev/sdaX
 
-swap: $ mkswap /dev/sdaX
-
-Active swap:
- 
+Create and mount swap: 
+$ mkswap /dev/sdaX
 $ swapon /dev/sdaX
  
 Mount:	/ en /mnt: $ mount /dev/sdaX /mnt
 
-Create directories for other partitions: 
-$ mkdir /mnt/boot
-$ mkdir /mnt/home
+Create and mount: 
 
-Mount partitions:
- 
-$ mount /dev/sdaX /mnt/boot
+$ mkdir /mnt/home
 $ mount /dev/sdaX /mnt/home
+
+$ mkdir /mnt/boot
+$ mount /dev/sdaX /mnt/boot
  
 Verify net connection
  
@@ -51,22 +45,22 @@ $ sudo nmcli dev wifi connect "SSID" password "contraseña"
 ######## INSTALLATION OF THE SYSTEM ########
  
 $ pacstrap /mnt base base-devel
-$ pacstrap /mnt grub-bios
 $ pacstrap /mnt networkmanager
 For the touch pad: $ pacstrap /mnt xf86-input-synaptics
 
 Generate the fstab file: $ genfstab -U -p /mnt >> /mnt/etc/fstab
+$ nano /mnt/etc/fstab
 
 For config the system: $ arch-chroot /mnt 
 
 Set the name with: $ nano /etc/hostname
--> myhostname
+-> bigoteh
 
 Add matching entries to /etc/hosts:
 $ nano /etc/hosts
 -> 127.0.0.1	localhost
 -> ::1		localhost
--> 127.0.1.1	
+-> 127.0.1.1	127.0.1.1 bigoteh.localdomain bigoteh
 
 Set the time zone: $ ln -s /usr/share/zoneinfo/America/Santiago /etc/localtime
  
@@ -97,15 +91,16 @@ Uncomment: [multilib]
 
 FOR DUAL BOOT:
 1] Linux boot loader option:
-	$ pacstrap /mnt grub efibootmgr dosfstools os-prober mtools
-	$ mkdir -p /mnt/boot/efi
-	$ mount /dev/sdaX /mnt/boot/efi
-	$ grub-install --target=86_64-efi --bootloader-id=grub_uefi --recheck
-	If you have problems use:
-	$ ...
+	$ pacman -S grub efibootmgr
+	$ mount /dev/sda1 /boot
+	$ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+	$ pacman -S os-prober
+	
+	$ mkdir /mnt/windows10
+	$ mount /dev/sda2 /mnt/windows10
  	
 	Create the file grub.cfg:
-	grub-mkconfig -o /boot/grub/grub.cfg
+	$ grub-mkconfig -o /boot/grub/grub.cfg
  
 Generate ramdisk: $ mkinitcpio -p linux
  
@@ -139,7 +134,7 @@ Update the system:
 $ sudo pacman -Syu
  
 INSTALACIÓN DE XORG:
-$ sudo pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils
+$ sudo pacman -S xorg-server xorg-xinit xorg-utils xorg-apps
 
 INSTALACION DE MESA:
 $ sudo pacman -S mesa mesa-demos
@@ -155,6 +150,12 @@ $ pacman -S intel-dri xf86-video-intel bumblebee nvidia bbswitch primus
 
 Install bash autocomplete:
 $ pacman -S bash-completion
+
+Audio:
+$ pacman -S alsa-utils pulseaudio pavucontrol
+
+Clock:
+$ hwclock --systohc --utc
 
 agregar usuario al grupo de trabajo de bumblebee:
 gpasswd bumblebee -a $USER
@@ -209,6 +210,8 @@ sudo reboot
 
 ######## AFTER INSTALLATION ########
 
-$ git clone https://aur.archlinux.org/yay.git
+$ git clone https://aur.
+
+hlinux.org/yay.git
 $ cd yay
 $ makepkg -si

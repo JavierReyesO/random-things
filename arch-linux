@@ -210,8 +210,8 @@ sudo reboot
 
 ######## AFTER INSTALLATION ########
 
-$ git clone https://aur.
-
-hlinux.org/yay.git
+$ git clone https://aur.archlinux.org/yay.git
 $ cd yay
 $ makepkg -si
+
+yay -Syu tilix zsh

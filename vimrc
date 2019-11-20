@@ -35,6 +35,8 @@ call SetupCommandAlias("Q","q")
 call SetupCommandAlias("Wq","wq")
 call SetupCommandAlias("WQ","wq")
 
+runtime macros/matchit.vim
+
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 

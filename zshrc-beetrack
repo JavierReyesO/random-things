@@ -116,7 +116,9 @@ export SPACESHIP_RUBY_SHOW=false
 export SPACESHIP_DOCKER_SHOW=false
 export SPACESHIP_GOLANG_SHOW=false
 export SPACESHIP_CONDA_SHOW=false
+export SPACESHIP_KUBECTL_SHOW=false
 export SPACESHIP_KUBECONTEXT_SHOW=false
+
 
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
@@ -134,10 +136,14 @@ alias vim='vim -O'
 export MSF_DATABASE_CONFIG=/usr/local/share/metasploit-framework/config/database.yml
 
 # RAILS
-# export RAILS_MASTER_KEY=8510167c83cc9cef2cc25443a202051b
 export EDITOR=vim
 export GOPATH=$HOME/go
 if [ /usr/local/bin/kubectl ]; then source <(kubectl completion zsh); fi
 
-export PATH="$PATH:/Users/javierreyes/Projects/istio-1.2.5/bin"
 alias kitchen='chef exec kitchen'
+
+export PATH="/usr/local/opt/postgresql@11/bin:$PATH"
+
+alias aws_login='$(aws ecr get-login --no-include-email)'
+
+alias free_docker='docker stop $(docker ps -aq) || docker rm -f $(docker ps -aq) || docker rmi $(docker images | grep '"'"'<none>'"'"' | awk '"'"'{print $3}'"'"')'

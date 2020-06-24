@@ -34,6 +34,7 @@ call SetupCommandAlias("W","w")
 call SetupCommandAlias("Q","q")
 call SetupCommandAlias("Wq","wq")
 call SetupCommandAlias("WQ","wq")
+call SetupCommandAlias("Wqa","wqa")
 
 runtime macros/matchit.vim
 
